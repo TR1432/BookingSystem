@@ -1,10 +1,12 @@
 import prisma from "./prismaClient";
 
-export const createbooking = async ( name:string, location:string, description:string, capacity?:number ) => {
+export const createbooking = async ( name:string, purpose:string, startTimeString:string, endTimeString: string, userId: number, auditoriumId: number) => {
     
     try {
+        let  startTime = new Date(startTimeString);
+        let endTime =  new Date(endTimeString);
         return await prisma.booking.create({
-            data: { name, location, capacity, description},
+            data: { name, purpose, startTime, endTime, user:  { connect: { id: userId } }, auditorium: { connect: { id: auditoriumId} } }
         });
     } catch (error) {
         return {
@@ -18,25 +20,40 @@ export const getAllbookings = async () => {
     return await prisma.booking.findMany();
 }
 
-export const findbooking = async ( id?:number, name?:string, capacity?:number ) => {
+export const findbooking = async ( id?:number, name?:string, userId?:number, auditoriumId?:number, startTimeString:string = '', endTimeString:string= '') => {
+
     
     try {
-        if( !id && !name && !capacity ){
+        if( !id && !name && !userId && !auditoriumId && startTimeString == '' && endTimeString == ''){
             return {msg: "No Parameters Given"}
-        }else if(!capacity){
-            let booking = await prisma.booking.findMany({where: {
-                ...(id && { id }),
-                ...(name && { name }),
-            }})
-            if(!booking){
-                return {msg: "No booking Found"}
-            }
-            return booking
         }else{
-            let booking = await prisma.booking.findMany({where: {
+            let startTime = startTimeString ? new Date(startTimeString) : null
+            let endTime = endTimeString ? new Date(endTimeString) : null
+            let booking = await prisma.booking.findMany({where: startTime && endTime ?{
                 ...(id && { id }),
                 ...(name && { name }),
-                capacity: {gte: capacity}
+                ...(userId && { user: { id: userId } }),
+                ...(auditoriumId && { auditorium: { id: auditoriumId } }),
+                startTime: {gte: startTime},
+                endTime: {gte: endTime}
+            } : startTime ?
+            {
+                ...(id && { id }),
+                ...(name && { name }),
+                ...(userId && { user: { id: userId } }),
+                ...(auditoriumId && { auditorium: { id: auditoriumId } }),
+                startTime: {gte: startTime}
+            } : endTime ? {
+                ...(id && { id }),
+                ...(name && { name }),
+                ...(userId && { user: { id: userId } }),
+                ...(auditoriumId && { auditorium: { id: auditoriumId } }),
+                endTime: {gte: endTime}
+            }: {
+                ...(id && { id }),
+                ...(name && { name }),
+                ...(userId && { user: { id: userId } }),
+                ...(auditoriumId && { auditorium: { id: auditoriumId } }),
             }})
             if(!booking){
                 return {msg: "No booking Found"}
@@ -51,23 +68,25 @@ export const findbooking = async ( id?:number, name?:string, capacity?:number ) 
     }
 }
 
-export const updatebooking = async ( id:number, name?:string, location?:string, capacity?:number, description?:string ) => {
+export const updatebooking = async ( id:number, name?:string, purpose?:string, startTimeString:string = '', endTimeString:string= '' ) => {
 
     try {
-        if( !location && !name && !capacity && !description ){
+        if( !purpose && !name && startTimeString == '' && endTimeString == '' ){
             return {msg: "No Parameters To Update"}
         }else{
             let booking = await prisma.booking.findFirst({where: {id: id}})
             if(!booking){
                 return {msg: "No booking To Update"}
             }
+            let startTime = startTimeString ? new Date(startTimeString) : null
+            let endTime = endTimeString ? new Date(endTimeString) : null
             await prisma.booking.update({
                 where: {id: booking.id},
                 data: {
                     ...(name && {name}),
-                    ...(location && {location}),
-                    ...(capacity && {capacity}),
-                    ...(description && {description})
+                    ...(purpose && {purpose}),
+                    ...(startTime && {startTime}),
+                    ...(endTime && {endTime})
                 }
             })
             return {msg: "booking Successfully Updated"}
