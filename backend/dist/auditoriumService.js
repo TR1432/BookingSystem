@@ -74,7 +74,7 @@ const updateAuditorium = (id, name, location, capacity, description) => __awaite
                 where: { id: auditorium.id },
                 data: Object.assign(Object.assign(Object.assign(Object.assign({}, (name && { name })), (location && { location })), (capacity && { capacity })), (description && { description }))
             });
-            return { msg: "Auditorium Successfully Updated" };
+            return auditorium;
         }
     }
     catch (error) {

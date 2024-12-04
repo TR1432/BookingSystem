@@ -70,7 +70,7 @@ export const updateAuditorium = async ( id:number, name?:string, location?:strin
                     ...(description && {description})
                 }
             })
-            return {msg: "Auditorium Successfully Updated"}
+            return auditorium
         }
     } catch (error) {
         return {

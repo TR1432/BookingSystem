@@ -13,6 +13,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Tempuser {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  password  String
+  token     String
+  createdAt DateTime @default(now())
+}
+
 model User {
   id        Int       @id @default(autoincrement())
   name      String
