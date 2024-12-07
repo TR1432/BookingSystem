@@ -13,14 +13,30 @@ router.get('/', (req, res) => {
     }
 })
 
-router.post('/bookings', (req, res) => {
+router.post('/', (req, res) => {
     let { name, purpose, userId, auditoriumId, startTimeString, endTimeString } = req.body
-    
+    if( isTimeRangeAvailable(startTimeString, endTimeString, auditoriumId)){
+        let booking = createbooking(name, purpose, startTimeString, endTimeString, userId, auditoriumId)
+        if(!booking.error){
+            res.json(booking)
+        }else{
+            res.sendStatus(400)
+        }
+    }
+})
+
+router.put('/:id', (req, res) => {
+    let id = req.params.id
+    let { name, purpose, startTimeString, endTimeString } = req.body
+    let booking = updatebooking(id, name, purpose, startTimeString, endTimeString)
+    if(!booking.msg){
+        res.json(booking)
+    }
 })
 
 function isTimeRangeAvailable(startTimeString, endTimeString, auditoriumId) {
-    const newStart = new Date(startTime);
-    const newEnd = new Date(endTime);
+    const newStart = new Date(startTimeString);
+    const newEnd = new Date(endTimeString);
 
     if (newStart >= newEnd) {
         return false;
@@ -38,6 +54,11 @@ function isTimeRangeAvailable(startTimeString, endTimeString, auditoriumId) {
             return false;
         }
     }
-
     return true;
 }
+
+router.delete('/', (req, res) => {
+    let id = req.params.id
+    let booking = deletebooking(id)
+    res.json(booking)
+})

@@ -73,7 +73,7 @@ const updatebooking = (id_1, name_1, purpose_1, ...args_1) => __awaiter(void 0, 
                 where: { id: booking.id },
                 data: Object.assign(Object.assign(Object.assign(Object.assign({}, (name && { name })), (purpose && { purpose })), (startTime && { startTime })), (endTime && { endTime }))
             });
-            return { msg: "booking Successfully Updated" };
+            return booking;
         }
     }
     catch (error) {

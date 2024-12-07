@@ -7,7 +7,9 @@ export const createTempuser = async ( name:string, email: string, password:strin
                 name,
                 email,
                 password,
-                token
+                token,
+                expiresAt:  new Date(Date.now() + 30 * 60 * 1000),
+
             }
         })
     } catch (error) {
@@ -37,5 +39,32 @@ export const findTempuser = async ( name:string, email: string, password:string,
 }
 
 export const deleteTempuser = async ( id:number ) => {
-    
+    try {
+        prisma.tempuser.delete({
+            where: {
+                id
+            }
+        })
+        return {msg: "Success"}
+    } catch (error) {
+        return {
+            error: error,
+            msg: "Error Deleting TempUser"
+        }
+    }
+}
+
+export const deleteExpiredUser = async () => {
+    try {
+        prisma.tempuser.deleteMany({
+            where:{
+                expiresAt: { lt: new Date() }
+            }
+        })
+    } catch (error) {
+        return {
+            error: error,
+            msg: "Error Deleting TempUser"
+        }
+    }
 }

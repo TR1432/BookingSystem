@@ -89,7 +89,7 @@ export const updatebooking = async ( id:number, name?:string, purpose?:string, s
                     ...(endTime && {endTime})
                 }
             })
-            return {msg: "booking Successfully Updated"}
+            return booking
         }
     } catch (error) {
         return {

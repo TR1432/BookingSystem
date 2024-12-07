@@ -41,7 +41,7 @@ const findUser = (criteria) => __awaiter(void 0, void 0, void 0, function* () {
 const getUser = (id, name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if ((!name && !email && !id) || !password) {
-            return { msg: 'No parameters sent' };
+            return { error: 'No parameters sent' };
         }
         return yield findUser({ id, name, email, password });
     }
@@ -56,7 +56,7 @@ exports.getUser = getUser;
 const isUser = (id, name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if ((!name && !email && !id) || !password) {
-            return { msg: 'No parameters sent' };
+            return { error: 'No parameters sent' };
         }
         const user = yield findUser({ id, name, email, password });
         return {
@@ -75,11 +75,11 @@ exports.isUser = isUser;
 const updateUser = (id, name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if ((!name && !email && !id) || !password) {
-            return { msg: 'No parameters To Update' };
+            return { error: 'No parameters To Update' };
         }
         const user = yield findUser({ id, name, email, password });
         if (!user) {
-            return { msg: "User Not Found" };
+            return { error: "User Not Found" };
         }
         prismaClient_1.default.user.update({
             where: { id: user.id },
@@ -99,7 +99,7 @@ const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let user = yield findUser({ id });
         if (!user) {
-            return { msg: "User NOt Found" };
+            return { error: "User NOt Found" };
         }
         yield prismaClient_1.default.user.delete({
             where: { id: user.id }

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTempuser = exports.findTempuser = exports.createTempuser = void 0;
+exports.deleteExpiredUser = exports.deleteTempuser = exports.findTempuser = exports.createTempuser = void 0;
 const prismaClient_1 = __importDefault(require("./prismaClient"));
 const createTempuser = (name, email, password, token) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -21,7 +21,8 @@ const createTempuser = (name, email, password, token) => __awaiter(void 0, void 
                 name,
                 email,
                 password,
-                token
+                token,
+                expiresAt: new Date(Date.now() + 30 * 60 * 1000),
             }
         });
     }
@@ -53,5 +54,35 @@ const findTempuser = (name, email, password, token) => __awaiter(void 0, void 0,
 });
 exports.findTempuser = findTempuser;
 const deleteTempuser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        prismaClient_1.default.tempuser.delete({
+            where: {
+                id
+            }
+        });
+        return { msg: "Success" };
+    }
+    catch (error) {
+        return {
+            error: error,
+            msg: "Error Deleting TempUser"
+        };
+    }
 });
 exports.deleteTempuser = deleteTempuser;
+const deleteExpiredUser = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        prismaClient_1.default.tempuser.deleteMany({
+            where: {
+                expiresAt: { lt: new Date() }
+            }
+        });
+    }
+    catch (error) {
+        return {
+            error: error,
+            msg: "Error Deleting TempUser"
+        };
+    }
+});
+exports.deleteExpiredUser = deleteExpiredUser;
