@@ -12,10 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUser = exports.isUser = exports.getUser = exports.getAllUsers = exports.createUser = void 0;
+exports.deleteUser = exports.updateUser = exports.getUser = exports.getAllUsers = exports.createUser = void 0;
 const prismaClient_1 = __importDefault(require("./prismaClient"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const createUser = (name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        password = yield bcrypt_1.default.hash(password, 10);
         return yield prismaClient_1.default.user.create({
             data: { name, email, password },
         });
@@ -38,12 +40,12 @@ const findUser = (criteria) => __awaiter(void 0, void 0, void 0, function* () {
         where: Object.assign(Object.assign(Object.assign(Object.assign({}, (id && { id })), (name && { name })), (email && { email })), { password }),
     });
 });
-const getUser = (id, name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
+const getUser = (id, name, email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if ((!name && !email && !id) || !password) {
+        if ((!name && !email && !id)) {
             return { error: 'No parameters sent' };
         }
-        return yield findUser({ id, name, email, password });
+        return yield findUser({ id, name, email });
     }
     catch (error) {
         return {
@@ -53,37 +55,18 @@ const getUser = (id, name, email, password) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.getUser = getUser;
-const isUser = (id, name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        if ((!name && !email && !id) || !password) {
-            return { error: 'No parameters sent' };
-        }
-        const user = yield findUser({ id, name, email, password });
-        return {
-            isUser: !!user,
-            user_id: (user === null || user === void 0 ? void 0 : user.id) || '',
-        };
-    }
-    catch (error) {
-        return {
-            error,
-            msg: 'Error fetching user',
-        };
-    }
-});
-exports.isUser = isUser;
 const updateUser = (id, name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if ((!name && !email && !id) || !password) {
             return { error: 'No parameters To Update' };
         }
-        const user = yield findUser({ id, name, email, password });
+        const user = yield findUser({ id });
         if (!user) {
             return { error: "User Not Found" };
         }
         prismaClient_1.default.user.update({
             where: { id: user.id },
-            data: Object.assign(Object.assign(Object.assign({}, (name && { name })), (email && { email })), (password && { password }))
+            data: Object.assign(Object.assign(Object.assign({}, (name && { name })), (email && { email })), (password && { password: yield bcrypt_1.default.hash(password, 10) }))
         });
         return { msg: "User Successfully Updated" };
     }

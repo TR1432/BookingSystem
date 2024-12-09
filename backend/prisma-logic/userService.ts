@@ -21,23 +21,21 @@ export const getAllUsers = async () => {
 }
 
 const findUser = async (criteria: {id?:number; name?: string; email?: string; password?: string }) => {
-    const { id, name, email, password } = criteria;
+    const { id, name, email } = criteria;
     return await prisma.user.findFirst({
       where: {
         ...(id && {id}),
         ...(name && { name }),
         ...(email && { email }),
-        password,
       },
     });
   }; 
 
 export const getUser = async (id?: number, name?: string, email?: string) => {
   try {
-    if ((!name && !email && !id)) {
+    if (!name && !email && !id) {
       return { error: 'No parameters sent' };
     }
-
     return await findUser({ id, name, email});
   } catch (error) {
     return {

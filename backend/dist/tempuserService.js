@@ -22,7 +22,7 @@ const createTempuser = (name, email, password, token) => __awaiter(void 0, void 
                 email,
                 password,
                 token,
-                expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+                expiresAt: new Date(Date.now() + 30 * 60 * 1000)
             }
         });
     }
@@ -34,12 +34,10 @@ const createTempuser = (name, email, password, token) => __awaiter(void 0, void 
     }
 });
 exports.createTempuser = createTempuser;
-const findTempuser = (name, email, password, token) => __awaiter(void 0, void 0, void 0, function* () {
+const findTempuser = (email, token) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield prismaClient_1.default.tempuser.findFirst({
             where: {
-                name,
-                password,
                 email,
                 token
             }

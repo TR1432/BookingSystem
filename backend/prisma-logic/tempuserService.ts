@@ -8,8 +8,7 @@ export const createTempuser = async ( name:string, email: string, password:strin
                 email,
                 password,
                 token,
-                expiresAt:  new Date(Date.now() + 30 * 60 * 1000),
-
+                expiresAt:  new Date(Date.now() + 30 * 60 * 1000)
             }
         })
     } catch (error) {
@@ -20,12 +19,10 @@ export const createTempuser = async ( name:string, email: string, password:strin
     }
 }
 
-export const findTempuser = async ( name:string, email: string, password:string, token:string ) => {
+export const findTempuser = async ( email: string, token:string ) => {
     try {
         return await prisma.tempuser.findFirst({
             where: {
-                name,
-                password,
                 email,
                 token
             }

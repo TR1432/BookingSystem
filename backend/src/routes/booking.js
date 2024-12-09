@@ -1,4 +1,5 @@
 import { createbooking, getAllbookings, findbooking, updatebooking, deletebooking } from '../../dist/bookingService'
+import { authUserwebtoken } from '../utils/authenticate'
 const express = require('express')
 const router = express.Router()
 
@@ -13,7 +14,7 @@ router.get('/', (req, res) => {
     }
 })
 
-router.post('/', (req, res) => {
+router.post('/', authUserwebtoken, (req, res) => {
     let { name, purpose, userId, auditoriumId, startTimeString, endTimeString } = req.body
     if( isTimeRangeAvailable(startTimeString, endTimeString, auditoriumId)){
         let booking = createbooking(name, purpose, startTimeString, endTimeString, userId, auditoriumId)
@@ -25,7 +26,7 @@ router.post('/', (req, res) => {
     }
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id', authUserwebtoken, (req, res) => {
     let id = req.params.id
     let { name, purpose, startTimeString, endTimeString } = req.body
     let booking = updatebooking(id, name, purpose, startTimeString, endTimeString)
@@ -57,7 +58,7 @@ function isTimeRangeAvailable(startTimeString, endTimeString, auditoriumId) {
     return true;
 }
 
-router.delete('/', (req, res) => {
+router.delete('/', authUserwebtoken, (req, res) => {
     let id = req.params.id
     let booking = deletebooking(id)
     res.json(booking)
